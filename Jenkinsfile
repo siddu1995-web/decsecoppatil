@@ -7,7 +7,7 @@ pipeline{
     stages{
         stage("test"){
             steps{
-                 sh("unam")
+                 sh("uname")
                  echo "STAGE1 IS COMPLEEDyy"
                  script{
                      def hy=sh(script: 'uname',returnStdout: true).trim()

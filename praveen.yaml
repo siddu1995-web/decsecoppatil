@@ -6,7 +6,7 @@
      - name: Installing the apachess
        yum:
          name: httpd
-         state: present
+         state: pre
 
      - name: vERIFYING the package installed or not
        shell:

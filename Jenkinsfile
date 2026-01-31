@@ -1,53 +1,60 @@
 pipeline{
     agent any
-    environment{
-        a="Linux"
-        part="/"
-    }
     stages{
-        stage("test"){
-            steps{
-                 sh("uname")
-                 echo "STAGE1 IS COMPLEEDyy"
-                 script{
-                     def hy=sh(script: 'uname',returnStdout: true).trim()
-                     echo "Output os is ${hy}"
-                     if ("${hy}" == "${a}"){
-                         echo "CORRECT OS"
-                         def sgy=sh(script:'sh /tmp/drt.sh ${part}',returnStdout: true).trim()
-                         echo "${sgy}"
-                         if ("${sgy}" =~ "exceeeded"){
-                             echo "There is disk space issue stop the build"
-                             error("Build stop due todisk issue")
-                         }
-                         else{
-                             echo "No issue found continue"
-                         }
-                     }
-                     else{
-                         echo "WRONG OS"
-                         error("Build wil fail since os is not linux")
-                     }
-                 }
+        stage("TEST"){
+            when{
+                changeset "praveen.yaml"
             }
-           
-        }
-        stage("dev"){
             steps{
-                sh("free")
-                echo "STAGE2 is completed"
-            }   
+                sh("sudo yum install python3-pip* -y")
+            }
         }
+        stage("DEV"){
+            when{
+                changeset "praveen.yaml"
+            }
+            steps{
+                sh ("pip --version")
+            }
+        }
+        stage("DEV1"){
+            when{
+                changeset "praveen.yaml"
+            }
+            steps{
+                sh("sudo pip3 install ansible")
+            }
+        }
+        stage("PRD"){
+            when{
+                changeset "praveen.yaml"
+            }
+            steps{
+                sh("ansible --version")
+            }
+        }
+        stage("POSTPRID"){
+            when{
+                changeset "praveen.yaml"
+            }
+            steps{
+                sh("ansible localhost -m shell -a 'uptime'")
+                sh ("cp $WORKSPACE/praveen.yaml /tmp")
+                sh("ansible-playbook /tmp/praveen.yaml")
+            }
+        }
+        
+            
     }
     post{
         always{
-            echo "need to chek suucess or failure"
-        }
-        success{
-            echo "build is scucess since all stages completed succesfully"
+            echo "Needd to check build success r not"
         }
         failure{
-            echo "build is failure"
+            echo "Build is failed"
+        }
+        success{
+            echo "Build is success"
         }
     }
 }
